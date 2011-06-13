@@ -38,7 +38,7 @@ if( ! class_exists( 'Facebook_2_1_2' ) )
 require_once( 'wp-fb-comments-class.php' );
 if(is_admin())
 {
-	//Add files for displaying admin panel properly
+    //Add files for displaying admin panel properly
 	require_once( 'admin/admin.php' );
 }
 else
