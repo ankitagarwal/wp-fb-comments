@@ -71,6 +71,10 @@ Callback url and canvas url are shown in the options page of the plugin.
 
 You can connect any account to the plugin as long as it has Admin rights of the page whose pageid you specified.
 
+= How to add custom images to the post in Facebook? =
+
+You can specify image url with the meta filed to your post with the name "wpfb_image".Be default the first image attachment of the post will be used as the post image. 
+
 = Do i need to manually share the posts in facebook? =
 
 Nope.Each post is shared as soon as its published automatically.

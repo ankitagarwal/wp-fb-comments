@@ -60,12 +60,28 @@ class wp_fb_comments
             if(strlen($expt)>300)
                 $expt=substr($expt,0,300)."...";
             $permalink = get_permalink( $post_ID);
-            $update =  array
-            (                        
-                'name'          => "$title",
-                'link'          => "$permalink",
-                'description'   => "$expt",
-            );
+            $image = get_post_meta($post_ID, "wpfb_image", true);
+            if(empty($image))
+            $image=get_image_url($post_ID);
+            if(empty($image))
+            {
+                $update =  array
+                (                        
+                    'name'          => "$title",
+                    'link'          => "$permalink",
+                    'description'   => "$expt",
+                );
+            }
+            else
+            {
+                $update =  array
+                (                        
+                    'name'          => "$title",
+                    'link'          => "$permalink",
+                    'description'   => "$expt",
+                    'picture'       => "$image",
+                );
+            }
             $update['access_token']=$this->options['ptoken'];
             //print_r($update);
             try
@@ -225,6 +241,22 @@ class wp_fb_comments
     function get_base_url()
     {
         return $this->base_url;
+    }
+    function get_image_url($post_ID)
+    {
+        $childargs = array
+        (
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'post_parent' => $post_ID
+        );
+        
+        if( $images = get_children( $childargs ) )
+        {
+            foreach( $images as $image )
+                return array_shift( wp_get_attachment_image_src( $image->ID, 'medium' ) );
+        }
+        return $this->default_image_url();
     }
     function get_facebook()
     {
