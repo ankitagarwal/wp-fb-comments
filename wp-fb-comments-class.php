@@ -256,7 +256,7 @@ class wp_fb_comments
             foreach( $images as $image )
                 return array_shift( wp_get_attachment_image_src( $image->ID, 'medium' ) );
         }
-        return $this->default_image_url();
+        return NULL;
     }
     function get_facebook()
     {
