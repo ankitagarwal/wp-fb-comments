@@ -25,6 +25,12 @@ All your posts will be automatically shared via your page in FB.You have complet
 8. once saved,click on connect admin account to connect your Fb account to your wp.
 9. Enjoy the merging!!
 
+This description from calebgriffin might be usefull to you:-
+
+First of all, the Page ID is a string of numbers. It is NOT a URL or a username. It is only numbers. The easiest way to get those numbers is to click on your fan page's profile pic and grab the numbers from the address bar.
+Secondly, I had to fill in both my Canvas URL and my Site URL (a.k.a. Callback URL) on my Facebook App settings. Simply put in your blog's URL into these fields.
+Then I saved changes in my app settings, entered the ID, Key, and Secret into my WP-FB-Comments settings, and saved there. Then I clicked the Connect Admin FBacc button at the bottom and everything filled in.
+Remember, your blog comments will jump to Facebook automatically but your FB comments take an hour or so before jumping to the blog page. 
 
 == Common Errors ==
 
