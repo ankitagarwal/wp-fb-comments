@@ -32,7 +32,7 @@ class wp_fb_comments
     function init()
     {
         add_filter('http_request_timeout',array($this,'mytimeout'));
-        add_action('publish_post', array($this,'comments_share'));
+        add_action('publish_post', array($this,'post_share'));
         add_action('comment_post', array($this,'push_comments'));
         add_action('wp_fb_comments_daily', array($this,'daily_cron'));
         add_action('wp_fb_comments_hourly', array($this,'hourly_cron'));
@@ -45,7 +45,11 @@ class wp_fb_comments
     {
         return Facebook_2_1_2::$DOMAIN_MAP[$key];
     }
-    function comments_share($post_ID)
+    /* Function is used to share  post
+     * @param $post_ID ID of the post which needs to be shared
+     * 
+     */
+    function post_share($post_ID)
     {
         //Check if already shared
         $fbpostid = get_post_meta($post_ID,"fbpostid",TRUE);
@@ -62,7 +66,7 @@ class wp_fb_comments
             $permalink = get_permalink( $post_ID);
             $image = get_post_meta($post_ID, "wpfb_image", true);
             if(empty($image))
-            $image=get_image_url($post_ID);
+                $image=get_image_url($post_ID);
             if(empty($image))
             {
                 $update =  array
@@ -98,10 +102,17 @@ class wp_fb_comments
             }
         }
     }
+    
+    /* Function is used to push comments to Facebook
+     * @param $commend_id ID of the comment to be pushed
+     * 
+     */
+    
     function push_comments($comment_id)
     {
         $comment = get_comment($comment_id, ARRAY_A);
         $fbpostid = get_post_meta($comment['comment_post_ID'],"fbpostid",TRUE);
+        // if the post is shared on fb
         if($fbpostid)
         {
             $update['message']=$comment['comment_author']." says\n".$comment['comment_content'];
