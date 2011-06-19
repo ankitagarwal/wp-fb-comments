@@ -35,10 +35,10 @@ class wp_fb_comments
         add_action('publish_post', array($this,'post_share'));
         
         // comment Hooks
-        add_action('comment_post', array($this,'push_comments'));
-        add_action('comment_unapproved_to_approved', 'comment_approved');
-        add_action('comment_spam_to_approved', 'comment_approved');
-        add_action('comment_trash_to_approved', 'comment_approved');
+        add_action('comment_post', array($this,'push_comment_by_id'));
+        add_action('comment_unapproved_to_approved', array($this,'push_comment'));
+        add_action('comment_spam_to_approved', array($this,'push_comment'));
+        add_action('comment_trash_to_approved', array($this,'push_comment'));
         
         //Cron Hooks
         add_action('wp_fb_comments_daily', array($this,'daily_cron'));
@@ -101,38 +101,39 @@ class wp_fb_comments
     }
     
     /* Function is used to push comments to Facebook
-     * @param $commend_id ID of the comment to be pushed
+     * @param $comment OBJECT of the comment to be pushed
      * 
      */
     
-    function push_comments($comment_id)
+    function push_comment($comment)
     {
-        $comment = get_comment($comment_id, ARRAY_A);
-        $fbpostid = get_post_meta($comment['comment_post_ID'],"fbpostid",TRUE);
+        if(! is_object($comment))
+            $comment = get_comment($comment, OBJECT);
+        $fbpostid = get_post_meta($comment->comment_post_ID,"fbpostid",TRUE);
         // if the post is shared on fb and its not a pingback or track back + comment is approved.
-        if($fbpostid && empty($comment['comment_type']) && $comment['comment_approved']==="1" )
+        if($fbpostid && empty($comment->comment_type) && $comment->comment_approved === "1" )
         {
-            $update['message']=$comment['comment_author']." says\n".$comment['comment_content'];
+            $update['message'] = $comment->comment_author." says\n".$comment->comment_content;
             $update['access_token']=$this->options['ptoken'];
             try
             {
                 $ret_code=$this->facebook->api('/'.$fbpostid.'/comments', 'POST', $update);
-                add_comment_meta($comment_id,"fbcommentid",$ret_code['id'],TRUE);
-                $this->save_log("Pushing comments",$comment['comment_post_ID'],$comment_id,$fbpostid,"Success");
+                add_comment_meta($comment->comment_ID ,"fbcommentid",$ret_code['id'],TRUE);
+                $this->save_log("Pushing comments",$comment->comment_post_ID,$comment->comment_ID,$fbpostid,"Success");
             }
             catch (FacebookApiException_2_1_2 $e) 
             { 
                 $result = $e->getResult();
                 $err_msg  = isset($result['error']) ? $result['error']['message'] : $result['error_msg'];
-                $this->save_log("Pushing comments",$comment['comment_post_ID'],$comment_id,$ret_code['id'],"Error returned from FB:- ".$err_msg);
+                $this->save_log("Pushing comments",$comment->comment_post_ID,$comment->comment_ID,$ret_code['id'],"Error returned from FB:- ".$err_msg);
             }
             
         }
     }
     
-    function comment_approved($comment)
+    function push_comment_by_id($comment_id)
     {
-        push_comments($comment->ID);
+        push_comments(get_comment($comment_id, OBJECT));
     }
     function pull_comments($post_id)
     {
