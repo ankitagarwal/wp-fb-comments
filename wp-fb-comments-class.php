@@ -113,7 +113,7 @@ class wp_fb_comments
         $comment = get_comment($comment_id, ARRAY_A);
         $fbpostid = get_post_meta($comment['comment_post_ID'],"fbpostid",TRUE);
         // if the post is shared on fb
-        if($fbpostid)
+        if($fbpostid && empty($comment['comment_type']))
         {
             $update['message']=$comment['comment_author']." says\n".$comment['comment_content'];
             $update['access_token']=$this->options['ptoken'];
