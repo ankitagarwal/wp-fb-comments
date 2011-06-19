@@ -195,8 +195,8 @@ class wp_fb_comments
 
         $pageposts = $this->wpdb->get_results($querystr, ARRAY_A);
         if($pageposts)
-        foreach($pageposts as $posts)
-        $this->pull_comments($posts['ID']);
+            foreach($pageposts as $posts)
+                $this->pull_comments($posts['ID']);
 
     }
     function hourly_cron()
@@ -212,8 +212,8 @@ class wp_fb_comments
 
         $pageposts = $this->wpdb->get_results($querystr, ARRAY_A);
         if($pageposts)
-        foreach($pageposts as $posts)
-        $this->pull_comments($posts['ID']);
+            foreach($pageposts as $posts)
+                $this->pull_comments($posts['ID']);
 
     }
     function save_log($action,$post_id,$comment_id,$fbid,$msg)
