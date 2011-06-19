@@ -33,13 +33,21 @@ class wp_fb_comments
     {
         add_filter('http_request_timeout',array($this,'mytimeout'));
         add_action('publish_post', array($this,'post_share'));
+        
+        // comment Hooks
         add_action('comment_post', array($this,'push_comments'));
+        add_action('comment_unapproved_to_approved', 'comment_approved');
+        add_action('comment_spam_to_approved', 'comment_approved');
+        add_action('comment_trash_to_approved', 'comment_approved');
+        
+        //Cron Hooks
         add_action('wp_fb_comments_daily', array($this,'daily_cron'));
         add_action('wp_fb_comments_hourly', array($this,'hourly_cron'));
+        
         if(!wp_next_scheduled('wp_fb_comments_daily'))
-        wp_schedule_event(time()+4600, "daily", 'wp_fb_comments_daily');
+            wp_schedule_event(time()+4600, "daily", 'wp_fb_comments_daily');
         if(!wp_next_scheduled('wp_fb_comments_hourly'))
-        wp_schedule_event(time()+3600, "hourly", 'wp_fb_comments_hourly');
+            wp_schedule_event(time()+3600, "hourly", 'wp_fb_comments_hourly');
     }
     function get_facebook_url($key='graph')
     {
@@ -101,8 +109,8 @@ class wp_fb_comments
     {
         $comment = get_comment($comment_id, ARRAY_A);
         $fbpostid = get_post_meta($comment['comment_post_ID'],"fbpostid",TRUE);
-        // if the post is shared on fb
-        if($fbpostid && empty($comment['comment_type']))
+        // if the post is shared on fb and its not a pingback or track back + comment is approved.
+        if($fbpostid && empty($comment['comment_type']) && $comment['comment_approved']==="1" )
         {
             $update['message']=$comment['comment_author']." says\n".$comment['comment_content'];
             $update['access_token']=$this->options['ptoken'];
@@ -116,10 +124,15 @@ class wp_fb_comments
             { 
                 $result = $e->getResult();
                 $err_msg  = isset($result['error']) ? $result['error']['message'] : $result['error_msg'];
-                $this->save_log("Pushing comments",$comment['comment_post_ID'],$comment_id,$ret_code['id'],"Error returned from FB".$err_msg);
+                $this->save_log("Pushing comments",$comment['comment_post_ID'],$comment_id,$ret_code['id'],"Error returned from FB:- ".$err_msg);
             }
             
         }
+    }
+    
+    function comment_approved($comment)
+    {
+        push_comments($comment->ID);
     }
     function pull_comments($post_id)
     {
