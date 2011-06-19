@@ -133,7 +133,7 @@ class wp_fb_comments
     
     function push_comment_by_id($comment_id)
     {
-        push_comments(get_comment($comment_id, OBJECT));
+        $this->push_comment(get_comment($comment_id, OBJECT));
     }
     function pull_comments($post_id)
     {
