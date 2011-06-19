@@ -65,27 +65,16 @@ class wp_fb_comments
                 $expt=substr($expt,0,300)."...";
             $permalink = get_permalink( $post_ID);
             $image = get_post_meta($post_ID, "wpfb_image", true);
+            $update =  array
+                (                        
+                    'name'          => "$title",
+                    'link'          => "$permalink",
+                    'description'   => "$expt",
+                );
             if(empty($image))
                 $image=get_image_url($post_ID);
-            if(empty($image))
-            {
-                $update =  array
-                (                        
-                    'name'          => "$title",
-                    'link'          => "$permalink",
-                    'description'   => "$expt",
-                );
-            }
-            else
-            {
-                $update =  array
-                (                        
-                    'name'          => "$title",
-                    'link'          => "$permalink",
-                    'description'   => "$expt",
-                    'picture'       => "$image",
-                );
-            }
+            if(!empty($image))
+                $update['picture'] = $image;
             $update['access_token']=$this->options['ptoken'];
             //print_r($update);
             try
